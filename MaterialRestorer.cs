@@ -48,72 +48,14 @@ public static class MaterialRestorer
     }
 
     // Your existing ProcessMaterials method:
+    // Your existing ProcessMaterials method:
 #if UNITY_EDITOR
     private static Material[] ProcessMaterials(Material[] materials, string materialsFolderPath)
     {
-        Material[] updatedMaterials = new Material[materials.Length];
-
-        for (int i = 0; i < materials.Length; i++)
-        {
-            Material originalMaterial = materials[i];
-            if (originalMaterial == null)
-            {
-                // Keep null if there's no material for that slot
-                updatedMaterials[i] = null;
-                continue;
-            }
-
-            // Check if this material is already a saved asset
-            string originalPath = AssetDatabase.GetAssetPath(originalMaterial);
-            Material finalMaterial = null;
-
-            if (!string.IsNullOrEmpty(originalPath))
-            {
-                // The material is already a .mat file in the project.
-                if (originalPath.StartsWith(materialsFolderPath))
-                {
-                    // It's already in the right folder. Use it directly.
-                    finalMaterial = originalMaterial;
-                }
-                else
-                {
-                    // Move it to our Materials folder
-                    string fileName = Path.GetFileName(originalPath);
-                    string newPath = Path.Combine(materialsFolderPath, fileName).Replace('\\', '/');
-
-                    // If there's already a file at that path, Unity will rename the moved file
-                    AssetDatabase.MoveAsset(originalPath, newPath);
-                    finalMaterial = AssetDatabase.LoadAssetAtPath<Material>(newPath);
-
-                    Debug.Log($"Moved material '{originalMaterial.name}' from '{originalPath}' to '{newPath}'.");
-                }
-            }
-            else
-            {
-                // The material is not an asset (likely an instance). Let's see if there's a matching .mat in the folder.
-                string potentialPath = Path.Combine(materialsFolderPath, originalMaterial.name + ".mat").Replace('\\', '/');
-                Material existingMat = AssetDatabase.LoadAssetAtPath<Material>(potentialPath);
-
-                if (existingMat != null)
-                {
-                    // Reuse existing material
-                    finalMaterial = existingMat;
-                    Debug.Log($"Reused existing material '{existingMat.name}' at '{potentialPath}'.");
-                }
-                else
-                {
-                    // Create a new .mat asset in the folder by cloning the original
-                    Material newMat = Object.Instantiate(originalMaterial);
-                    AssetDatabase.CreateAsset(newMat, potentialPath);
-                    finalMaterial = newMat;
-                    Debug.Log($"Created new material asset for '{originalMaterial.name}' at '{potentialPath}'.");
-                }
-            }
-
-            updatedMaterials[i] = finalMaterial;
-        }
-
-        return updatedMaterials;
+        // If you don't need to store or move materials as .mat assets,
+        // simply return the original materials without any AssetDatabase calls.
+        return materials;
     }
 #endif
+
 }
